@@ -1,0 +1,14 @@
+.signUpBtn {
+    background: linear-gradient(to bottom, rgba(56, 56, 56) 0%, rgb(255, 255, 255) 50%, rgba(56, 56, 56) 100%);
+}
+
+.signUpBtn div {
+    background-color: rgba(29, 29, 29, 1);
+    margin: 0 2px;
+    border-radius: 24px;
+    padding: 8.4px;
+}
+
+.arrow-rotate {
+    transform: rotate(226deg);
+}

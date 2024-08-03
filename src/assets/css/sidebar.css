@@ -1,0 +1,57 @@
+.gradiantVecorsBg {
+    background: linear-gradient(to bottom, rgb(56, 56, 56), rgba(255, 255, 255), rgb(56, 56, 56));
+    border-radius: 12px;
+    padding: 1px;
+}
+
+.activeMainMenu {
+    background: linear-gradient(to bottom, rgb(56, 56, 56), rgba(255, 255, 255), rgb(56, 56, 56));
+    border-radius: 12px;
+    padding: 1px;
+}
+
+.sidebarbtnBgBlack {
+    background: #1a1a1a;
+    z-index: 7 !important;
+    border: none;
+}
+
+.active {
+    opacity: 1;
+}
+
+.animationcss {
+    animation-name: identifier;
+    animation-duration: 0.9s;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes identifier {
+    0% {
+        max-height: 0px;
+        overflow-y: hidden;
+    }
+
+    100% {
+        max-height: 220px;
+        overflow-y: hidden;
+    }
+}
+
+.logout:hover {
+    background: linear-gradient(to bottom, rgb(56, 56, 56), rgba(255, 255, 255), rgb(56, 56, 56));
+    border-radius: 12px;
+    padding: 1px;
+}
+
+.logout-btn {
+    background: transparent;
+    z-index: 7 !important;
+    border-radius: 12px;
+    border: 1px solid #1f2937;
+}
+
+.logout:hover .logout-btn {
+    background: #1a1a1a;
+    border: none;
+}

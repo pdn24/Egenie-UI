@@ -1,0 +1,173 @@
+.mainHeadingSvg {
+    background-image: url('../icons/heddingVector.svg');
+    background-position: center;
+    background-size: 100% 100%;
+    padding: 10px 25px;
+}
+
+.gradiantVecorBg {
+    background: linear-gradient(to bottom, rgba(56, 56, 56) 0%, rgb(255, 255, 255) 50%, rgba(56, 56, 56) 100%);
+    border-radius: 50px;
+    padding: 2px;
+}
+
+.bgVector {
+    position: relative;
+}
+
+.bgVector::after {
+    background-image: url('../icons/mainBgVector.svg');
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: 730px;
+    bottom: 0;
+    content: " ";
+    display: block;
+    height: 390px;
+    position: absolute;
+    right: 0;
+    width: 740px;
+
+}
+
+.unionBtn {
+    position: relative;
+}
+
+.unionBtn::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 30px;
+    height: 12px;
+    background: rgba(26, 26, 26, 1);
+    top: 20px;
+    right: -20px;
+    z-index: 2;
+}
+
+.unionBtn::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 19px;
+    height: 22px;
+    top: 1px;
+    right: -15.4px;
+    border-radius: 11px;
+    border: 2px solid #c7c4c4;
+    z-index: 5;
+    border-top: 2px solid transparent;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+}
+
+
+.unionSendBtn {
+    position: relative;
+}
+
+.unionSendBtn::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: 20px;
+    top: 29px;
+    left: -16px;
+    border-radius: 30px;
+    border: 2px solid #c7c4c4;
+    z-index: 5;
+    border-bottom: 2px solid transparent;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+}
+
+.bgLightGreen {
+    background: rgba(1, 224, 165, 1);
+}
+
+.noiseMainImg {
+    background-image: url('../image/noiseMainImg.svg');
+    background-size: 100% 100%;
+    padding: 20px 30px 30px 0;
+    border-radius: 50px !important;
+    z-index: 1;
+}
+
+@media (max-width:400px) {
+    .noiseMainImg {
+        padding: 20px 20px 30px 0px;
+    }
+}
+
+.btnBgBlack {
+    background: rgba(26, 26, 26, 1);
+}
+
+.pricingCardBorder {
+    border-image: repeating-linear-gradient(30deg, #ffffff, #D1D1D1, #ffffff 160px) 1;
+    border-bottom: 1px solid;
+}
+
+.signUpBtn {
+    background: linear-gradient(90deg, rgba(255, 255, 255) 0%, rgb(56, 56, 56) 20%, rgb(70, 69, 69) 80%, rgba(255, 255, 255) 100%);
+}
+
+.cardHover:hover {
+    background-color: #000000;
+    color: white;
+}
+
+.cardHover:hover .cardBtnHover {
+    background-color: #ffffff;
+    color: black;
+}
+
+.cardHover:hover .pricingCardBorder {
+    border-image: repeating-linear-gradient(30deg, #161616, #6b6b6b, #161616 160px) 1;
+    border-bottom: 1px solid;
+}
+
+.cardHover:hover .fontSemibold {
+    font-weight: 600;
+}
+.registerform{
+    max-width:100%;
+    background-image: url('../image/Rectangle.png');
+    width: 520px;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    border-radius: 30px;
+    background-size: cover;
+}
+.register-form .max-w-2xl{
+    max-width: 500px !important;
+    
+}
+.register-form .rounded-lg{
+    border-radius: 25px !important;
+    overflow: hidden !important;
+    background: transparent !important;    
+}
+
+
+
+
+@media (max-width:1600px) {
+    .fs-34 {
+        font-size: 19px !important;
+    }
+}
+
+@media (max-width:1600px) and (min-width:1200px) {
+    .pricing-plan-gap {
+        gap: 20px !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .pricingCardWrap {
+        display: flex !important;
+    }
+}

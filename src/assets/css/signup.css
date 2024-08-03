@@ -1,0 +1,57 @@
+.align-user {
+    top: 13px;
+    left: 20px;
+}
+
+.storeLink {
+    top: 13px;
+    left: 20px;
+}
+
+@media (max-width:1280px) {
+    .storeLink {
+        top: 8px;
+        left: 16px;
+    }
+
+    .align-user {
+        top: 10px;
+        left: 19px;
+    }
+}
+
+.loginPageBg {
+    background-image: url('../image/Signup.svg');
+}
+
+.loginPageCard {
+    background-image: url('../image/Rectangle.png');
+    width: 520px;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    border-radius: 30px;
+    background-size: 100% 100%;
+}
+
+.inputBorder {
+    border: 1px solid rgb(37, 37, 37);
+}
+
+.googleLoginBtn {
+    background: rgba(26, 26, 26, 1);
+}
+
+@media (max-width:370px) {
+    .mainHeadingSize {
+        font-size: 25px;
+        width: 250px;
+    }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    border: 1px solid white;
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;
+}
