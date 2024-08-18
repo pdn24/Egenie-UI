@@ -6,9 +6,9 @@ const AcceptConnection = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const storeId = queryParams?.get("store_id") || null;
-  const storeName = queryParams?.get("store_name") || null;
-  const userId = queryParams?.get("user_id") || null;
+  const storeId = queryParams?.get("storeId") || null;
+  const storeName = queryParams?.get("storeName") || null;
+  const userId = queryParams?.get("userId") || null;
   const token = queryParams?.get("token") || null;
 
   function submitButton() {
