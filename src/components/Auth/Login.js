@@ -31,6 +31,8 @@ const Login = () => {
     });
     const apiUrl = process.env.REACT_APP_API_URL;
 
+    console.log('API URL:', process.env.REACT_APP_API_URL);
+
     const handleChange = (e) => {
         setFormValue({ ...formValue, [e.target.name]: e.target.value });
         setErrors({ ...errors, [e.target.name]: "" });

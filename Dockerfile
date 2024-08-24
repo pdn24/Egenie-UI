@@ -18,6 +18,11 @@ COPY . .
 # Build the React app (use appropriate environment variables)
 ARG REACT_APP_ENV=production
 ENV REACT_APP_ENV=${REACT_APP_ENV}
+
+# Select the correct .env file based on the environment
+RUN if [ "$REACT_APP_ENV" = "production" ]; then cp .env.production .env; else cp .env.development .env; fi
+
+# Build the React app
 RUN npm run build --if-present
 
 # Stage 2: Serve the React app using a lightweight web server
