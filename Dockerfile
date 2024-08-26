@@ -28,8 +28,12 @@ RUN npm run build --if-present
 # Stage 2: Serve the React app using a lightweight web server
 FROM nginx:alpine
 
+
 # Copy the built React app from the previous stage
 COPY --from=build /app/build /usr/share/nginx/html
+
+# Set permissions on the build directory
+RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 
 # Expose port 80 for the web server
 EXPOSE 80
