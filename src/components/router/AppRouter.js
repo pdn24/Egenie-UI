@@ -26,8 +26,7 @@ function AppRouter() {
     const cookies = new Cookies();
     const token = cookies.get('login_token');
     const location = useLocation();
-    const apiUrl = process.env.REACT_APP_API_URL;
-
+   
     const pathsWithSidebar = [
         '/home2', '/connectstore2', '/storeconnected',
         '/store', '/template', '/bulkformat', '/accountinfo', '/Accountinfo',

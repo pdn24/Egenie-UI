@@ -103,6 +103,7 @@ export default function BulkFormat() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const userId = cookies.get("user_id");
   const storeId = localStorage.getItem("active_store_id");
+  console.log('store_id', storeId)
 
   const handleDateRange = () => {
     setIsDateRangeOpen(!isDateRangeOpen);

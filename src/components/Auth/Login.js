@@ -12,7 +12,7 @@ import closeIcon from '../../assets/icons/closeIconWhite.svg';
 import axios from 'axios';
 import { Cookies } from 'react-cookie';
 import UserContext from '../../context/userInfoContext';
-import { useGoogleLogin } from '@react-oauth/google';
+
 
 const Login = () => {
     const cookies = new Cookies();
@@ -31,7 +31,7 @@ const Login = () => {
     });
     const apiUrl = process.env.REACT_APP_API_URL;
 
-    console.log('API URL:', process.env.REACT_APP_API_URL);
+    console.log('API URL:', apiUrl); // Log the API URL to ensure it's correctly set
 
     const handleChange = (e) => {
         setFormValue({ ...formValue, [e.target.name]: e.target.value });
@@ -86,39 +86,10 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            try {
-                const response = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`, {
-                    headers: {
-                        Authorization: `Bearer ${tokenResponse.access_token}`,
-                        Accept: 'application/json',
-                    },
-                });
-
-                // Send user info to your backend
-                const loginResponse = await axios.post(`${apiUrl}/auth`, {
-                    username: response.data.email,
-                    login_type: 'google',
-                });
-
-                const login_token = loginResponse.data?.access_token;
-                cookies.set('login_token', login_token);
-                cookies.set('user_id', loginResponse.data?.user?.id);
-                localStorage.setItem("user_info", JSON.stringify(loginResponse.data?.user));
-                const activeStore = loginResponse.data?.user?.stores.find((store) => store.is_selected === true);
-                localStorage.setItem("active_store_id", activeStore?.id);
-                fetchUserInfo(loginResponse.data?.user?.id);
-                navigate("/connectstore2", { state: { isConnectNewStore: true } });
-
-            } catch (error) {
-                console.error("Google login error:", error);
-            }
-        },
-        onError: (error) => {
-            console.log('Google login error:', error);
-        },
-    });
+    const handleGoogleLogin = () => {        
+        window.location.href = `${apiUrl}/auth/google`;
+    };
+    
 
     const handleGoToHome = () => {
         navigate('/');

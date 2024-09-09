@@ -16,7 +16,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the React app (use appropriate environment variables)
-ARG REACT_APP_ENV=production
+ARG REACT_APP_ENV=development
 ENV REACT_APP_ENV=${REACT_APP_ENV}
 
 # Select the correct .env file based on the environment

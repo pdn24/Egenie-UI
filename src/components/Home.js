@@ -1,10 +1,12 @@
-import React, { useEffect, useState, handleClick } from "react";
+import React, { useEffect, useState } from "react";
 import "../assets/css/Home.css";
 import Header from "./Header";
 import truIcon from "../assets/icons/trueIcon.svg";
 import closeRedIcon from "../assets/icons/closeRedIcon.svg";
 import sendIcon from "../assets/icons/sendIcon.svg";
 import noiseMain from "../assets/image/noiseMain.png";
+import googleIcon from "../assets/image/google.svg";
+import facebookIcon from "../assets/image/facebook.svg";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,6 +16,7 @@ import password from "../assets/image/LockPassword.svg";
 import { Modal } from "flowbite-react";
 import { Cookies } from "react-cookie";
 import { Link } from "react-router-dom";
+import { useGoogleLogin } from '@react-oauth/google';
 import { showAlert } from "./utils/AlertService";
 
 const Home = () => {
@@ -32,6 +35,7 @@ const Home = () => {
     password: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -170,6 +174,41 @@ const Home = () => {
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        console.log('Home.js -Inside googleLogin:');
+        const response = await axios.get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${codeResponse.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${codeResponse.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        );        
+
+        const loginResponse = await axios.post(`${apiUrl}/auth`, {
+          username: response.data.email,
+          login_type: "google",
+        });
+
+        const login_token = loginResponse.data?.access_token;
+        cookies.set("login_token", login_token);
+        cookies.set("user_id", loginResponse.data?.user?.id);
+        localStorage.setItem("user_info", JSON.stringify(loginResponse.data?.user));
+        const activeStore = loginResponse.data?.user?.stores.find((store) => store.is_selected === true);
+        localStorage.setItem("active_store_id", activeStore?.id);
+        navigate("/connectstore2", { state: { isConnectNewStore: true } });
+      } catch (error) {
+        console.error("Google login error:", error);
+      }
+    },
+    onError: (error) => {
+      console.log("Google login error:", error);
+    },
+  });
 
   return (
     <>
@@ -323,113 +362,130 @@ const Home = () => {
         className=" register-form   "
       >
         <Modal.Body className="  sm:pl-10 pl-1 sm:pr-10 pr-1 sm:pb-10 pb-5 pt-0 helvetica  registerform ">
-          <div className="">
-            <h2 className="text-center font-bold text-white sm:text-2xl text-xl mt-4  ">
-              Register
-            </h2>
-            <form className="mt-4 " onSubmit={registerSubmit}>
-              <div className="flex flex-col gap-1 xl:gap-2 ">
-                <label
-                  className="text-gray-200 text-xs xl:text-base ms-[18px] mt-5"
-                  style={{ marginTop: "24px", fontSize: "17px" }}
-                >
-                  Full Name
-                </label>
-                <div className="relative">
-                  <span className="absolute align-user ">
-                    <img src={usericon} alt="user-icon" />
-                  </span>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    onChange={handleChange}
-                    placeholder="Enter full name"
-                    autoComplete="name"
-                    className="h-[40px] xl:h-[50px] w-full pl-14 bg-white googleLoginBtn inputBorder rounded-full text-white placeholder:text-black-400 xl:text-md text-sm sm:leading-6 focus:border-none focus:ring-black"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs ms-5 absolute -bottom-5 mt-5">
-                      {errors.name}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 xl:gap-2 w-full">
-                <label
-                  className="text-gray-300 text-xs xl:text-base ms-[18px] mt-5"
-                  style={{ marginTop: "24px", fontSize: "17px" }}
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <span className="absolute align-user">
-                    <img src={email} alt="user-icon" />
-                  </span>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    autoComplete="email"
-                    className="h-[40px] xl:h-[50px] w-full pl-14 bg-transparent googleLoginBtn inputBorder rounded-full text-white placeholder:text-gray-400 xl:text-md sm:leading-6 text-sm focus:border-none focus:ring-black"
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs ms-5  absolute -bottom-5 mt-5">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 xl:gap-2 w-full">
-                <label
-                  className="text-gray-300 text-xs xl:text-base ms-[18px] mt-5"
-                  style={{ marginTop: "24px", fontSize: "17px" }}
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <span className="absolute align-user">
-                    <img src={password} alt="user-icon" />
-                  </span>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    autoComplete="new-password"
-                    className="h-[40px] xl:h-[50px] w-full pl-14 bg-transparent inputBorder googleLoginBtn rounded-full text-white  placeholder:text-gray-400 xl:text-md text-sm sm:leading-6 focus:border-none focus:ring-black mb-5"
-                  />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs ms-5 absolute -bottom-5 mt-5">
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div
-                className="flex justify-center items-center  gap-2 mt-5"
-                style={{ marginTop: "30px" }}
+        <div className="">
+          <h2 className="text-center font-bold text-white text-lg sm:text-xl mt-2">
+            Register
+          </h2>
+          <form className="mt-2" onSubmit={registerSubmit}>
+            <div className="flex flex-col gap-0.5 xl:gap-1">
+              <label
+                className="text-gray-200 text-xs sm:text-sm ms-[18px] mt-3"
+                style={{ marginTop: "12px", fontSize: "14px" }}
               >
-                <button
-                  type="reset"
-                  className="max-w-[200px] w-full sm:h-[45px] h-[40px] bg-black text-white rounded-full hover:bg-white hover:text-black font-bold hover:border hover:border-black  "
-                  onClick={handleClose}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="max-w-[200px] w-full sm:h-[45px] h-[40px] bg-black text-white rounded-full hover:bg-white hover:text-black font-bold hover:border hover:border-black   "
-                >
-                  Submit
-                </button>
+                Full Name
+              </label>
+              <div className="relative">
+                <span className="absolute align-user">
+                  <img src={usericon} alt="user-icon" />
+                </span>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  onChange={handleChange}
+                  placeholder="Enter full name"
+                  autoComplete="name"
+                  className="h-[30px] sm:h-[35px] w-full pl-12 bg-white googleLoginBtn inputBorder rounded-full text-black placeholder:text-black-400 text-sm sm:text-base leading-5 focus:border-none focus:ring-black"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs ms-5 absolute -bottom-4 mt-2">
+                    {errors.name}
+                  </p>
+                )}
               </div>
-            </form>
+            </div>
+            <div className="flex flex-col gap-0.5 xl:gap-1 w-full">
+              <label
+                className="text-gray-300 text-xs sm:text-sm ms-[18px] mt-3"
+                style={{ marginTop: "12px", fontSize: "14px" }}
+              >
+                Email
+              </label>
+              <div className="relative">
+                <span className="absolute align-user">
+                  <img src={email} alt="user-icon" />
+                </span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  className="h-[30px] sm:h-[35px] w-full pl-12 bg-transparent googleLoginBtn inputBorder rounded-full text-white placeholder:text-gray-400 text-sm sm:text-base leading-5 focus:border-none focus:ring-black"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs ms-5 absolute -bottom-4 mt-2">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col gap-0.5 xl:gap-1 w-full">
+              <label
+                className="text-gray-300 text-xs sm:text-sm ms-[18px] mt-3"
+                style={{ marginTop: "12px", fontSize: "14px" }}
+              >
+                Password
+              </label>
+              <div className="relative">
+                <span className="absolute align-user">
+                  <img src={password} alt="user-icon" />
+                </span>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  autoComplete="new-password"
+                  className="h-[30px] sm:h-[35px] w-full pl-12 bg-transparent inputBorder googleLoginBtn rounded-full text-white placeholder:text-gray-400 text-sm sm:text-base leading-5 focus:border-none focus:ring-black mb-3"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-xs ms-5 absolute -bottom-4 mt-2">
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div
+              className="flex justify-center items-center gap-1.5 mt-3"
+            >
+              <button className='w-full h-[36px] xl:h-[40px] rounded-xl text-center bg-white text-black text-sm xl:text-base font-bold'>Sign up</button>
+            </div>
+          </form>
+          <div className="flex items-center flex-col px-4 sm:px-12 my-2 gap-2">
+            <div className="flex items-center text-white w-full gap-1">
+              <span className="border-t w-full border-gray-700"></span>
+              <p className="text-gray-200 text-sm">Or</p>
+              <span className="border-t w-full border-gray-700"></span>
+            </div>
+            <div className="flex items-center w-full gap-1.5">
+              <button
+                className="flex items-center justify-center rounded-3xl gap-2 googleLoginBtn w-full h-[30px] sm:h-[35px] inputBorder"
+                onClick={() => googleLogin()}
+              >
+                <img src={googleIcon} alt="user-icon" />
+                <span className="text-white text-sm sm:text-base">Google</span>
+              </button>
+              <button className="flex items-center justify-center rounded-3xl gap-2 googleLoginBtn w-full h-[30px] sm:h-[35px] inputBorder">
+                <img src={facebookIcon} alt="user-icon" />
+                <span className="text-white text-sm sm:text-base">Facebook</span>
+              </button>
+            </div>
+            <p className="flex items-center gap-1 text-sm">
+              <span className="text-gray-400 text-xs sm:text-sm">
+                Already have an account?
+              </span>
+              <Link to="/login">
+                <span className="text-white underline text-xs sm:text-sm">
+                  Sign In
+                </span>
+              </Link>
+            </p>
           </div>
-        </Modal.Body>
+        </div>
+      </Modal.Body>
       </Modal>
       <Footer />
     </>

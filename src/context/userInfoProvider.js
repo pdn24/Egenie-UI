@@ -14,6 +14,7 @@ export const UserProvider = ({ children }) => {
     const apiUrl = process.env.REACT_APP_API_URL;
 
     const fetchUserInfo = async (id) => {
+        console.log('In fetchUserInfo userid: ', id)
         const data = {
             user_id: id
         }
@@ -21,9 +22,13 @@ export const UserProvider = ({ children }) => {
             const response = await axios.post(`${apiUrl}/user/get_user_info`, data, {
                 headers: { 'Content-Type': 'application/json' },
             })
+            console.log("In fetchUserInfo:after call to user/get_user_info : ", response)
             setUserdata(response.data)
+            console.log('In fetchuserinfo: setIsStoreConnected', response.data.stores?.length !== 0)
             setIsStoreConnected(response.data.stores?.length !== 0);
+            console.log('Value of setIsStoreConnected:', response.data.stores?.length !== 0);
             const activeStore = response.data?.stores.find((store) => store.is_selected === true)
+            console.log("fetchUserInfo:", activeStore?.id )
             localStorage.setItem("active_store_id", activeStore?.id)
         } catch (err) {
             console.log('err: ', err)
