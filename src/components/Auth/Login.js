@@ -87,7 +87,7 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {        
-        window.location.href = `${apiUrl}/auth/google`;
+        window.open(`${apiUrl}/auth/google`, '_blank');
     };
     
 
