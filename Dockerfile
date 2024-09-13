@@ -12,6 +12,9 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm install --legacy-peer-deps
 
+# Check Node.js and npm versions
+RUN node -v && npm -v
+
 # Copy the rest of the application code
 COPY . .
 
@@ -24,6 +27,9 @@ RUN if [ "$REACT_APP_ENV" = "production" ]; then cp .env.production .env; else c
 
 # Build the React app
 RUN npm run build --if-present
+
+# Debug: List the contents of /app/build to check if build succeeded
+RUN ls -la /app/build
 
 # Stage 2: Serve the React app using a lightweight web server
 FROM nginx:alpine
