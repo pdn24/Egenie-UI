@@ -1,48 +1,14 @@
-# syntax=docker/dockerfile:1
-
-# Stage 1: Build the React app
-FROM node:18-alpine as build
-
-# Set the working directory
-WORKDIR /app
-
-# Copy package.json and package-lock.json to leverage Docker cache
-COPY package.json package-lock.json ./
-
-# Install dependencies
-RUN npm install --legacy-peer-deps
-
-# Check Node.js and npm versions
-RUN node -v && npm -v
-
-# Copy the rest of the application code
-COPY . .
-
-# Build the React app (use appropriate environment variables)
-ARG REACT_APP_ENV=production
-ENV REACT_APP_ENV=${REACT_APP_ENV}
-
-# Select the correct .env file based on the environment
-RUN if [ "$REACT_APP_ENV" = "production" ]; then cp .env.production .env; else cp .env.development .env; fi
-
-# Build the React app
-RUN npm run build --if-present
-
-# Debug: List the contents of /app/build to check if build succeeded
-RUN ls -la /app/build
-
-# Stage 2: Serve the React app using a lightweight web server
+# Use the Nginx base image to serve the built React app
 FROM nginx:alpine
 
+# Copy the built React app from the local 'build' folder into the Nginx web root
+COPY ./build /usr/share/nginx/html
 
-# Copy the built React app from the previous stage
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Set permissions on the build directory
+# Set permissions on the Nginx web root (optional, but ensures correct permissions)
 RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 
-# Expose port 80 for the web server
+# Expose port 80 to the outside world
 EXPOSE 80
 
-# Start the Nginx server
+# Start Nginx and keep the process running in the foreground
 CMD ["nginx", "-g", "daemon off;"]
