@@ -8,7 +8,7 @@ COPY ./build /usr/share/nginx/html
 RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 
 # Expose port 80 to the outside world
-EXPOSE 80
+EXPOSE 3000
 
 # Start Nginx and keep the process running in the foreground
 CMD ["nginx", "-g", "daemon off;"]
