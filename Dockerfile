@@ -13,6 +13,13 @@ RUN npm install
 # Copy all other source code into the working directory
 COPY . .
 
+# Set build argument and environment variable
+ARG REACT_APP_ENV
+ENV REACT_APP_ENV $REACT_APP_ENV
+
+# Copy the appropriate .env file based on the REACT_APP_ENV argument
+COPY .env.$REACT_APP_ENV .env
+
 # Build the app for production
 RUN npm run build
 
