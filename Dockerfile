@@ -1,14 +1,32 @@
-# Use the Nginx base image to serve the built React app
+# Stage 1: Build React app
+FROM node:16.20.2 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the package.json and package-lock.json (if present)
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy all other source code into the working directory
+COPY . .
+
+# Build the app for production
+RUN npm run build
+
+# Stage 2: Serve with Nginx
 FROM nginx:alpine
 
-# Copy the built React app from the local 'build' folder into the Nginx web root
-COPY ./build /usr/share/nginx/html
+# Remove the default Nginx static assets
+RUN rm -rf /usr/share/nginx/html/*
 
-# Set permissions on the Nginx web root (optional, but ensures correct permissions)
-RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
+# Copy built React files from the build stage
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 80 to the outside world
+# Expose port 80
 EXPOSE 80
 
-# Start Nginx and keep the process running in the foreground
+# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
