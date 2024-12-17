@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import "../../index.css";
 
@@ -15,23 +14,29 @@ import AccountInfo from '../screens/Profile/AccountInfo';
 import LoginSecurity from '../screens/Profile/LoginSecurity';
 import PlanBilling from '../screens/Profile/PlanBilling';
 import UserAndPermissions from '../screens/Setting/UserAndPermissions';
+import GenerateTemplate from '../screens/ProductDescription/GenerateTemplate';
+
 import AddStaff from '../screens/Setting/AddStaff';
 import Home from '../Home';
 import PageNotFound from '../utils/PageNotFound';
 import Login from '../Auth/Login';
 import Register from '../Auth/Register';
 import ResetPassword from '../screens/Profile/ResetPassword';
+import SetPassword from '../screens/Profile/SetPassword';
+import { useContext } from 'react';
+import UserContext from '../../context/userInfoContext';
 
 function AppRouter() {
     const cookies = new Cookies();
     const token = cookies.get('login_token');
     const location = useLocation();
-   
+    const { userdata } = useContext(UserContext);
+
     const pathsWithSidebar = [
-        '/home2', '/connectstore2', '/storeconnected',
+        '/home2', '/connectstore2', '/storeConnected',
         '/store', '/template', '/bulkformat', '/accountinfo', '/Accountinfo',
-        '/loginsecurity', '/planbilling', '/userandpermission', '/addstaff'
-    ]; 
+        '/loginsecurity', '/planbilling', '/userandpermission', '/addstaff', '/generateTemplate' 
+    ];
 
     const showSidebar = token && pathsWithSidebar.includes(location.pathname);
 
@@ -42,7 +47,6 @@ function AppRouter() {
             </div>
             <div className={`w-full h-full ${token ? 'overflow-hidden' : ""}`}>
                 <Routes>
-                    {/* <Route path='/connectstore' element={<ConnectStore />} /> */}
                     <Route path='/home2' element={<Home2 />} />
                     <Route path='/connectstore2' element={<ConnectStore2 />} />
                     <Route path='/connect' element={<AcceptConnection />} />
@@ -55,10 +59,12 @@ function AppRouter() {
                     <Route path='/planbilling' element={<PlanBilling />} />
                     <Route path='/userandpermission' element={<UserAndPermissions />} />
                     <Route path='/addstaff' element={<AddStaff />} />
+                    <Route path='/generateTemplate' element={<GenerateTemplate />} />
                     <Route path='/' element={<Home />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/register' element={<Register />} />
-                    <Route path={`/user/reset_password/:token`} element={<ResetPassword />} />
+                    <Route path={`/user/reset_password/:token`} element={<ResetPassword />} />                    
+                    <Route path='/setpassword' element={<SetPassword />} />
                     <Route path='*' element={<PageNotFound />} />
                 </Routes>
             </div>

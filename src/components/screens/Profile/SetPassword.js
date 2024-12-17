@@ -1,79 +1,66 @@
-import React, { useContext, useEffect, useState } from 'react'
-import error from '../../../assets/image/error.jpg'
-import { Cookies } from 'react-cookie';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Modal } from 'flowbite-react';
-import EgenieLogo from '../../../assets/icons/EgenieLogo.svg';
-import Footer from '../../Footer'; 
 import axios from 'axios';
 import { showAlert } from '../../utils/AlertService';
-import UserContext from '../../../context/userInfoContext';
+import EgenieLogo from '../../../assets/icons/EgenieLogo.svg';
+import Footer from '../../Footer'; 
+import { useLocation, useNavigate } from 'react-router-dom'; 
 
-function ResetPassword() {
-    const cookies = new Cookies();
-    const navigate = useNavigate()
-    const { token } = useParams();
+function SetPassword({ token }) {
+    const location = useLocation();
+    const navigate = useNavigate(); 
+    const queryParams = new URLSearchParams(location.search);
+    const userId = queryParams.get("userId"); // Extract userId from the URL
     const [formData, setFormData] = useState({
-        user_id: cookies.get('user_id'),
         token: token,
+        user_id: userId,
         new_password: '',
         confirm_password: '',
-    })
+    });
     const [errors, setErrors] = useState({
         new_password: '',
         confirm_password: '',
-    })
+    });
     const [openModal, setOpenModal] = useState(true);
     const apiUrl = process.env.REACT_APP_API_URL;
 
-    const { handleLogOut } = useContext(UserContext)
-
-
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
-        setErrors({ ...errors, [e.target.name]: '' })
-    }
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: '' });
+    };
 
-
-    const handleResetPassword = async (e) => {
-        e.preventDefault()
-        let formIsValid = true
-        const newErrors = { ...errors }
+    const handleSetPassword = async (e) => {
+        e.preventDefault();
+        let formIsValid = true;
+        const newErrors = { ...errors };
         if (!formData.new_password) {
-            newErrors.new_password = 'Please enter a new password'
-            formIsValid = false
+            newErrors.new_password = 'Please enter a new password';
+            formIsValid = false;
         } else {
             newErrors.new_password = '';
         }
         if (!formData.confirm_password) {
-            newErrors.confirm_password = 'Please enter a comfirm password'
-            formIsValid = false
+            newErrors.confirm_password = 'Please enter a confirm password';
+            formIsValid = false;
         } else {
             newErrors.confirm_password = '';
         }
 
         if (!formIsValid) {
-            setErrors(newErrors)
+            setErrors(newErrors);
             return;
         }
         try {
-            const response = await axios.post(`${apiUrl}/user/update_password`, formData, {
-                headers: { 'Content-Type': 'application/json', },
-            })
-            handleLogOut()
-            showAlert(response.data?.message || "Password updated successfully", "success")
+            const response = await axios.post(`${apiUrl}/user/set_password`, formData, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            showAlert(response.data?.message || "Password set successfully", "success");
+            navigate('/login', { state: { fromSetPassword: true } });
         } catch (err) {
-            console.log('err: ', err)
-            showAlert(err.response?.data?.error || "Something went wrong", 'error')
+            console.log('err: ', err);
+            showAlert(err.response?.data?.error || "Something went wrong", 'error');
         }
-    }
-
-    useEffect(() => {
-        const token = cookies.get("login_token")
-        if (!token) {
-            navigate('/login')
-        }
-    }, [])
+    };
 
     return (
         <>
@@ -89,9 +76,9 @@ function ResetPassword() {
                     <Modal.Body className='p-5 bg-black rounded-lg'>
                         {/* Removed Modal.Header and added custom title text */}
                         <div className='text-center mb-5'>
-                            <h2 className='font-bold text-xl text-gray-200'>Reset Password</h2>
+                            <h2 className='font-bold text-xl text-gray-200'>Set New Password</h2>
                         </div>
-                        <form onSubmit={handleResetPassword}>
+                        <form onSubmit={handleSetPassword}>
                             <div className="flex flex-col gap-5">
                                 {/* New Password Field */}
                                 <div className='flex flex-col'>
@@ -126,7 +113,7 @@ function ResetPassword() {
             {/* Egenie Footer */}
             <Footer />
         </>
-    )
+    );
 }
 
-export default ResetPassword
+export default SetPassword;

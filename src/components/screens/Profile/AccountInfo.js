@@ -149,7 +149,7 @@ const handleCancelEdit = () => {
     // if (!userData.user_phonno) {
     //   newErrors.user_phonno = "User phon no. is required";
     //   formIsValid = false;
-    // } else if (userData.user_phonno.length < 10) {
+    // } else if (.user_phonno.length < 10) {
     //   newErrors.user_phonno = "Phon no must be 10 digit";
     //   formIsValid = false;
     // } else {
@@ -369,7 +369,9 @@ const handleCancelEdit = () => {
                 )}
               </div>
               <div className="flex justify-between xl:pb-5 pb-6 px-6">
-                <p className="xl:text-lg text-gray-400">Renews on</p>
+                <p className="xl:text-lg text-gray-400">
+                  {userInfo?.subscription[0]?.subscription_plan === 'Free' ? 'Ends on' : 'Renews on'}
+                </p>               
                 <p className="xl:text-lg text-black">
                   {userInfo?.subscription[0]?.renewal_date}
                 </p>

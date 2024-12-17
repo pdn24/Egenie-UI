@@ -20,6 +20,8 @@ import "react-date-range/dist/theme/default.css";
 import { DateRange } from "react-date-range";
 import { showAlert, showConfirmationDialog } from "../../utils/AlertService";
 import UserContext from "../../../context/userInfoContext";
+import Quill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const useDebouncedValue = (inputValue, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
@@ -60,7 +62,7 @@ export default function BulkFormat() {
   const [seletedPeriodValueName, setSeletedPeriodValueName] = useState("");
   const [allFormatTypes, setAllFormatTypes] = useState([]);
   const [seletedFormatTypeName, setSeletedFormatTypeName] = useState("");
-  const [formatSettingId, setFormatSettingId] = useState();
+  const [templateId, setTemplateId] = useState();
   const [selectedProductsForFormat, setSelectedProductsForFormat] = useState(
     []
   );
@@ -79,6 +81,10 @@ export default function BulkFormat() {
       key: "selection",
     },
   ]);
+
+  const [modifyTitle, setModifyTitle] = useState(false);
+  const [modifyProductType, setModifyProductType] = useState(false);
+  const [modifySeoTags, setModifySeoTags] = useState(false);
 
   const formatDate = (date1) => {
     const date = new Date(date1);
@@ -210,7 +216,7 @@ export default function BulkFormat() {
       };
       if (allFormatTypes.length === 0) {
         const allFormatTypesResponse = await axios.post(
-          `${apiUrl}/templates/get_all_format_types`,
+          `${apiUrl}/templates/get_templates`,
           data
         );
         setAllFormatTypes(allFormatTypesResponse.data);
@@ -241,8 +247,8 @@ export default function BulkFormat() {
   };
 
   const handleAllFormatTypes = async (types) => {
-    setSeletedFormatTypeName(types?.setting_name);
-    setFormatSettingId(types?.id);
+    setSeletedFormatTypeName(types?.template_name);
+    setTemplateId(types?.template_id);
     setFormatError("");
   };
 
@@ -312,11 +318,15 @@ export default function BulkFormat() {
   const handleSetFormatted = async () => {
     const data = {
       selected_products: convertStringifyProducts(),
-      format_setting_id: formatSettingId,
+      template_id: templateId,
       store_id: parseInt(storeId),
+      user_id: userId,
+      modify_title: modifyTitle,
+      modify_product_type: modifyProductType,
+      modify_seo_tags: modifySeoTags
     };
 
-    if (formatSettingId === undefined) {
+    if (templateId === undefined) {
       setFormatError("Please select format Type")
       return;
     }
@@ -357,7 +367,7 @@ export default function BulkFormat() {
           headers: { 'Content-Type': 'application/json', },
         })
         fetchProducts()
-        showAlert('Original product Restored successfully', 'success')
+        showAlert('Original product details restored successfully!', 'success')
       }
     } catch (err) {
       console.log('err: In revert product  ', err)
@@ -602,7 +612,7 @@ export default function BulkFormat() {
                               />
                             </td>
                             <td className="px-1 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                              <div className="w-[100px] h-[100px] rounded border">
+                              <div className="w-[75px] h-[75px] rounded border">
                                 <img
                                   src={product.image_url}
                                   alt="product"
@@ -722,10 +732,10 @@ export default function BulkFormat() {
                       <img src={closeIcon} alt="close icon" />
                     </button>
                   </div>
-                  <div className="p-4 mt-3  ">
+                  <div className="p-4 mt-3">
                     <div className="flex items-center justify-between">
                       <h2 className="sm:text-2xl text-xl font-bold">
-                        Format Type
+                        Format settings
                       </h2>
                       <p className="sm:text-base text-sm text-[#9B9B9B]">
                         {selectedProductsForFormat.length > 0
@@ -734,22 +744,39 @@ export default function BulkFormat() {
                         selected
                       </p>
                     </div>
-                    <div className="input-dropdown my-8">
-                      <div className="relative">
+                    <h3 className="text-sm text-gray-500 mt-2">
+                        Choose if Egenie should modify the title, type, or SEO tags using AI.
+                    </h3>
+                    <div className="my-8">
+                      <div className="flex flex-col space-y-2">
+                        <label className="flex items-center">
+                          <input type="checkbox" className="mr-2" onChange={(e) => setModifyTitle(e.target.checked)} />
+                            Product Title
+                        </label>
+                        <label className="flex items-center">
+                          <input type="checkbox" className="mr-2" onChange={(e) => setModifyProductType(e.target.checked)} />
+                            Product Type
+                        </label>
+                        <label className="flex items-center">
+                          <input type="checkbox" className="mr-2" onChange={(e) => setModifySeoTags(e.target.checked)} />
+                            SEO Tags
+                        </label>
+                      </div>
+                      <div className="relative mt-4">
                         <Dropdown
-                          label={seletedFormatTypeName || "Format Types"}
+                          label={seletedFormatTypeName || "Templates"}
                           className="option-height"
                         >
                           <Dropdown.Item disabled>
-                            Select Format Setting...{" "}
+                            Select a template{" "}
                           </Dropdown.Item>
                           {allFormatTypes &&
                             allFormatTypes.map((types, index) => (
                               <Dropdown.Item
-                                key={index}
+                                key={types.template_id}
                                 onClick={() => handleAllFormatTypes(types)}
                               >
-                                {types.setting_name}
+                                {types.template_name}
                               </Dropdown.Item>
                             ))}
                         </Dropdown>
@@ -777,6 +804,9 @@ export default function BulkFormat() {
           ) : (
             <></>
           )}
+          ) : (
+            <></>
+          )
         </div>
       </div>
 
@@ -789,15 +819,12 @@ export default function BulkFormat() {
       >
         <Modal.Header className="border-0 p-2"></Modal.Header>
         <Modal.Body className="pl-10 pr-10 pb-10 pt-0 helvetica">
-          <div>
-            <h2 className="text-center font-bold sm:text-2xl text-xl">
-              Product Details
-            </h2>
+          <div>           
             <p className="sm:text-xl text-lg font-medium text-center">
               {selectedProcuct.title}
             </p>
             <div className="flex justify-center my-5">
-              <div className="w-[125px] h-[125px] border rounded">
+              <div className="w-[100px] h-[100px] border rounded">
                 <img
                   src={selectedProcuct.image_url}
                   alt="table popup img"
@@ -805,16 +832,14 @@ export default function BulkFormat() {
                 />
               </div>
             </div>
-            <p className="text-[#9B9B9B] sm:text-xl text-base font-medium">
-              <span className="text-black">Description :</span>{" "}
-              {selectedProcuct.description}
-            </p>
-            <p className="text-[#9B9B9B] sm:text-xl text-base my-2 font-medium">
-              <span className="text-black"> Product type : </span>
-              {selectedProcuct.product_type}
-            </p>
-            <div className="text-[#9B9B9B] sm:text-xl text-base font-medium">
-              <span className="text-black"> Tags : </span>
+            <div className="mb-4 text-center">
+              <p className="text-[#9B9B9B] sm:text-sm text-xs my-2 font-medium">
+                <span className="text-black"> Product type : </span>
+                {selectedProcuct.product_type}
+              </p>
+            </div>
+            <div className="text-[#9B9B9B] sm:text-sm text-xs font-medium text-left">
+              <span className="text-black"> SEO Tags : </span>
               {selectedProcuct?.tags?.map((index) => (
                 <span key={index}>
                   {index}
@@ -822,6 +847,15 @@ export default function BulkFormat() {
                 </span>
               ))}
             </div>
+            <div className="mb-4">
+              <Quill
+                value={selectedProcuct.description}
+                readOnly={true}
+                theme="snow"
+                style={{ height: '400px' }}
+              />
+            </div>
+         
           </div>
         </Modal.Body>
       </Modal>
@@ -839,30 +873,30 @@ export default function BulkFormat() {
           <Modal.Body className="pl-10 pr-10 pb-10 pt-0 helvetica overflow-y-auto max-h-[770px] ">
             <div className="flex lg:gap-10 gap-4">
               <div className="bg-[#F9F9F9] border border-1 p-5 rounded-xl w-[50%]">
-                <h2 className="text-black font-bold text-2xl mb-2">
+                <h2 className="text-black font-bold text-xl mb-2 helvetica">
                   Original Product Data
                 </h2>
-                <p className="text-xl my-2 font-medium text-black"> Title :</p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-sm my-2 font-medium text-black"> Title </p>
+                <p className="text-[#9B9B9B] sm:text-sm text-xs my-2 font-medium">
                   {originalProductData.title}
                 </p>
-                <p className="text-black text-justify text-xl font-medium mt-2 mb-1">
-                  Description :{" "}
+                <p className="text-sm my-2 font-medium text-black"> 
+                  Description {" "}
                 </p>
-                <p className="text-[#9B9B9B] text-base">
-                  {originalProductData.body_html}
-                </p>
-                <p className="text-xl my-2 font-medium text-black">
+                <div className="text-[#9B9B9B] text-sm" style={{ height: '400px', overflowY: 'scroll' }}>
+                  <Quill value={originalProductData.body_html} readOnly={true} theme="bubble" />
+                </div>
+                <p className="text-sm my-2 font-medium text-black"> 
                   {" "}
-                  Product type :
+                  Product type
                 </p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-[#9B9B9B] text-sm">
                   {originalProductData.product_type}
                 </p>
-                <p className="text-black text-justify text-xl font-medium mt-2 mb-1">
-                  Tags :{" "}
+                <p className="text-sm my-2 font-medium text-black"> 
+                  Tags {" "}
                 </p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-[#9B9B9B] text-sm">
                   {originalProductData.tags}
                 </p>
               </div>
@@ -880,33 +914,33 @@ export default function BulkFormat() {
               </div>
 
               <div className="bg-[#F9F9F9] border border-1 p-5 rounded-xl w-[50%]">
-                <h2 className="text-black font-bold text-2xl mb-2">
+                <h2 className="text-black font-bold text-xl mb-2 helvetica">
                   Formatted Product Data
                 </h2>
-                <p className="text-xl mt-2 mb-1 font-medium text-black">
+                <p className="text-sm my-2 font-medium text-black"> 
                   {" "}
-                  Title :
+                  Title 
                 </p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.title}
                 </p>
-                <p className="text-black text-justify text-xl font-medium mt-2 mb-1">
-                  Description :{" "}
+                <p className="text-sm my-2 font-medium text-black"> 
+                  Description {" "}
                 </p>
-                <p className="text-[#9B9B9B] text-base">
-                  {modifiedProductData.body_html}
-                </p>
-                <p className="text-xl mt-2 font-medium text-black">
+                <div className="text-[#9B9B9B] text-sm" style={{ height: '400px', overflowY: 'scroll' }}>
+                  <Quill value={modifiedProductData.body_html} readOnly={true} theme="bubble" />
+                </div>
+                <p className="text-sm my-2 font-medium text-black"> 
                   {" "}
-                  Product type :
+                  Product type 
                 </p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.product_type}
                 </p>
-                <p className="text-black text-justify text-xl font-medium mt-2 mb-1">
-                  Tags :{" "}
+                <p className="text-sm my-2 font-medium text-black"> 
+                  Tags {" "}
                 </p>
-                <p className="text-[#9B9B9B] text-base">
+                <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.tags}
                 </p>
               </div>

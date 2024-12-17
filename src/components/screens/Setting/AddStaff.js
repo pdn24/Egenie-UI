@@ -44,7 +44,7 @@ export default function AddStaff() {
 
     const getUserRoles = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/user/get_user_roles`)
+            const response = await axios.get(`${apiUrl}/user/get_user_roles/1`)
             console.log('response: ', response)
             setUserRoles(response.data)
             setErrors({ ...errors, form: "" })
@@ -95,16 +95,28 @@ export default function AddStaff() {
             })
             console.log('response: ', response)
             showAlert(response.data.message, "success")
-            setTimeout(
-                navigate('/userandpermission', {
-                    state: {
-                        staffData: formValues
-                    }
-                }), 1000)
+            setTimeout(async () => {
+                try {
+                    const staffResponse = await axios.get(`${apiUrl}/user/get_all_users_by_store/${activeStore.id}`, {
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    console.log('staffResponse: ', staffResponse)
+                    navigate('/userandpermission', {
+                        state: {
+                            staffData: staffResponse.data
+                        }
+                    })
+                } catch (error) {
+                    console.log('error fetching staff: ', error)
+                    showAlert("Failed to reload staff list. Please try again.", "error")
+                }
+            }, 1000)
         } catch (error) {
             console.log('error: ', error)
+            if (error.response && error.response.status === 400 && error.response.data.error === "Invalid email address") {
+                showAlert("Invalid email address. Please check the email and try again.", "error")
+            } 
             showAlert(error.response.data.error || "Something went wrong", "error")
-
         }
     }
 
@@ -171,7 +183,7 @@ export default function AddStaff() {
 
                     <div className='flex gap-3 xl:px-5 px-2 py-3 admin-radio-input' >
                         {userRoles &&
-                            userRoles.map((role, i) => (
+                            userRoles.filter(role => role.name !== 'Owner').map((role, i) => (
                                 <div className='flex gap-2 items-center' key={i}>
                                     <input type='radio' name='role_id' value={role.id} className='accent-black' onClick={handlePermission} />
                                     <label>{role.name}</label>

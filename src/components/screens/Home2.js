@@ -20,6 +20,7 @@ export default function Home2() {
 
     useEffect(() => {
         if (userdata !== null) {
+            console.log('Home 2: 1st useeffect User data:', userdata);       
             setLoading(false);
         }
     }, [userdata]);
@@ -78,7 +79,7 @@ export default function Home2() {
             console.log("In Home2: Value of isStoreConnected", isStoreConnected)
             navigate('/connectstore2')
         }
-    }, [isStoreConnected])
+    }, [isStoreConnected, userdata])
 
     if (loading) {
         return <div>Loading...</div>;
@@ -138,14 +139,16 @@ export default function Home2() {
                     <div className='mt-14 sm:mt-10 xl:mt-24 px-2 xl:px-8  2xl:px-36'>
                         <h2 className='xl:text-[22px] text-base my-1 xl:my-5'>Linked Stores</h2>
                         <div className="grid  grid-cols-1 gap-3 xl:gap-5 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4">
-                            <div className='border rounded w-full'>
-                                <div className='flex justify-between items-center w-full py-2 px-3 '>
-                                    <p className='text-sm xl:text-lg'>Link a new store</p>
-                                    <button className='flex items-center justify-center bg-black rounded-full xl:h-5 xl:w-5 h-[14px] w-[14px]' onClick={handleNewStore}>
-                                        <img src={plusWhiteIcon} alt='icon' className='w-[10px]' />
-                                    </button>
+                            {userdata.is_owner && (
+                                <div className='border rounded w-full'>
+                                    <div className='flex justify-between items-center w-full py-2 px-3 '>
+                                        <p className='text-sm xl:text-lg'>Link a new store</p>
+                                        <button className='flex items-center justify-center bg-black rounded-full xl:h-5 xl:w-5 h-[14px] w-[14px]' onClick={handleNewStore}>
+                                            <img src={plusWhiteIcon} alt='icon' className='w-[10px]' />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             {storeInfo && storeInfo.map((store, index) => (
                                 <div className='border rounded w-full' key={index}>
                                     <div className='flex justify-between items-center w-full py-2 px-3 '>

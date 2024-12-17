@@ -16,18 +16,12 @@ import bilingIcon from '../assets/icons/bilingIcon.svg'
 import storeIcon from '../assets/icons/storeIcon.svg'
 import templateIcon from '../assets/icons/templateIcon.svg'
 import menuClose from '../assets/icons/menuClose.svg'
-import EgenieBlackLogo from '../assets/icons/EgenieBlack.svg'
-import menuBlack from '../assets/icons/menuBlack.svg'
-import closeIconBlack from '../assets/icons/closeIcon.svg'
 import sendIcon from '../assets/icons/sendIcon.svg'
-
-// import { Cookies } from 'react-cookie';
 import UserContext from '../context/userInfoContext';
 
 
 export default function Sidebar() {
     const navigate = useNavigate()
-    // const cookies = new Cookies();
     const { isStoreConnected, handleLogOut } = useContext(UserContext)
     const pathname = window.location.pathname
     const [subMenuVisibility, setSubMenuVisibility] = useState({
@@ -51,13 +45,16 @@ export default function Sidebar() {
     }
 
     useEffect(() => {
-        switch (pathname) {
+        console.log("In Sidebar pathname", pathname)
+        switch (pathname) {           
             case "/home2":
                 setSubMenuVisibility({ ...subMenuVisibility, home: true, });
                 break;
             case "/store":
             case "/template":
+            case "/generateTemplate":
             case "/bulkformat":
+            case "/storeConnected":
                 setSubMenuVisibility({ ...subMenuVisibility, product: true, });
                 break;
             case "/setting":
@@ -73,14 +70,6 @@ export default function Sidebar() {
         }
     }, [pathname]);
 
-    // const handleLogOut = () => {
-    //     cookies.remove("login_token");
-    //     cookies.remove("user_id");
-    //     localStorage.removeItem("user_info")
-    //     localStorage.removeItem("active_store_id")
-    //     // navigate('/')
-    //     window.location.href = '/';
-    // }
 
     return (
         <>
@@ -96,22 +85,7 @@ export default function Sidebar() {
                     </button>
                 </div>
             </div>
-            {/* <div className='block lg:hidden '>
-                <div className={`flex bg-black p-5 items-center relative  ${sidebarVisibility ? "justify-start" : "justify-center"}`}>
-                    <div className={`absolute ${sidebarVisibility ? " right-3" : "left-3"} `}>
-                        <button onClick={toggleSidebar}>
-                            {sidebarVisibility ?
-                                <img src={menuClose} alt='closeicon'  />
-                                :
-                                <img src={manuIcon} alt='menuicon' />
-                            }   
-                        </button>
-                    </div>
-                    <div className=''>
-                        <img src={EgenieLogo} width="75px" alt='icon' onClick={() => toggleSubMenu('home')} />
-                    </div>
-                </div>
-            </div> */}
+            {}
             <div className={`relative  ${sidebarVisibility ? "" : "hidden"} lg:block`}>
                 <aside className='sm:w-[300px] w-[250px] bg-black h-[90vh] lg:h-screen overflow-y-auto px-7 py-10 absolute lg:relative z-20'>
                     <div className='flex flex-col justify-between h-full 2xl:min-h-[650px] min-h-[500px] overflow-y-auto'>

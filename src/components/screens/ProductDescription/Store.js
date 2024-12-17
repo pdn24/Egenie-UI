@@ -71,27 +71,31 @@ function Store() {
     }, [])
     return (
         <div className='bg-gray-100 h-full 2xl:p-8 p-4 w-full helvetica flex flex-col'>
-            <div className='flex justify-between items-center mb-2'>
-                <h2 className='xl:text-[32px] text-2xl font-bold'>Store</h2>
-                <NavLink to={{ pathname: '/connectstore2' }}>
-                    <button className='bg-black flex items-center justify-center gap-3 rounded-[50px] w-[140px] xl:w-[200px] xl:h-[50px] lg:h-[45px] h-[36px]'>
-                        <img src={plusIcon} alt='plusIcon' />
-                        <span className='text-white text-sm lg:text-base lg:font-bold'>Add store</span>
-                    </button>
-                </NavLink>
-            </div>
+            {userdata.is_owner && (
+                <div className='flex justify-between items-center mb-2'>
+                    <h2 className='xl:text-[32px] text-2xl font-bold'>Store</h2>
+                    <NavLink to={{ pathname: '/connectstore2' }}>
+                        <button className='bg-black flex items-center justify-center gap-3 rounded-[50px] w-[140px] xl:w-[200px] xl:h-[50px] lg:h-[45px] h-[36px]'>
+                            <img src={plusIcon} alt='plusIcon' />
+                            <span className='text-white text-sm lg:text-base lg:font-bold'>Add store</span>
+                        </button>
+                    </NavLink>
+                </div>
+            )}
             {storeInfo?.length > 0 &&
                 storeInfo.map((store, i) => (
                     <div className='w-full h-full whiteBgHeight bg-white shadow shadow-gray xl:mt-4 mt-1 px-3 md:px-12 py-8 rounded-xl' key={i}>
                         <div className='flex justify-between items-center w-full'>
                             <h2 className='text-2xl font-bold'>Profile</h2>
-                            <div className='flex items-center gap-2'>
-                                {/* <img src={editIcon} className='w-[30px]' alt='editIcon' /> */}
-                                {/* <img src={editIcon} alt='trashIcon' className='cursor-pointer' /> */}
-                                <Tooltip content="Deactivate" placement="bottom"><button className='cursor-pointer'
-                                    onClick={() => handleStoreDeactivation(store.id)}><img src={editIcon} alt='trashIcon' /></button></Tooltip>
-
-                            </div>
+                            {userdata.is_owner && (
+                                <div className='flex items-center gap-2'>
+                                    <Tooltip content="Deactivate" placement="bottom">
+                                        <button className='cursor-pointer' onClick={() => handleStoreDeactivation(store.id)}>
+                                            <img src={editIcon} alt='trashIcon' />
+                                        </button>
+                                    </Tooltip>
+                                </div>
+                            )}
                         </div>
                         <div className='border w-full rounded-xl flex gap-4 flex-col mt-6 pt-5'>
                             <div className='border-b pb-4 sm:px-5 px-3'>

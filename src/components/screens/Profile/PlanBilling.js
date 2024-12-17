@@ -68,6 +68,7 @@ export default function PlanBilling() {
     })
 
     const getCardList = async () => {
+        console.log('getCardList called');
         const data = {
             user_id: userId
         }
@@ -75,7 +76,7 @@ export default function PlanBilling() {
             const response = await axios.post(`${apiUrl}/payment/get_payment_modes`, data, {
                 headers: { 'Content-Type': 'application/json' },
             })
-            console.log('response: ', response)
+            console.log('getCardList response: ', response)
             setCardsList(response.data.payment_modes)
 
         } catch (error) {
@@ -388,23 +389,7 @@ export default function PlanBilling() {
             })
         }
 
-    }
-
-    // const handleEditCard = async () => {
-    //     const data = { ...cardData, payment_mode_id: selectedCardId, user_id: userId }
-    //     console.log('data:> ', data)
-    //     try {
-    //         const response = await axios.post(`${apiUrl}/payment/edit_card`, data, {
-    //             headers: { 'Content-Type': 'application/json', },
-    //         })
-    //         console.log('response:delete ', response)
-    //         setOpenEditModal(false)
-    //         getCardList()
-    //     } catch (err) {
-    //         console.log('err: ', err)
-    //         showAlert(err.response.data.error || "Something went wrong", 'error',)
-    //     }
-    // }
+    } 
 
     const handleDeleteCard = async (cardId) => {
         const data = {
@@ -440,15 +425,6 @@ export default function PlanBilling() {
         return expDateFormatter;
     };
 
-    // const cc_format = (value) => {
-    //     const v = value.replace(/[^0-9]/gi, "").substr(0, 16);
-
-    //     const parts = [];
-    //     for (let i = 0; i < v.length; i += 4) {
-    //         parts.push(v.substr(i, 4));
-    //     }
-    //     return parts.length > 1 ? parts.join(" ") : value;
-    // };
 
     useEffect(() => {
         const token = cookies.get("login_token")
@@ -472,36 +448,50 @@ export default function PlanBilling() {
                                     <button className='bg-black rounded text-white xl:text-lg text-base font-bold max-w-[130px] xl:max-w-[160px] h-[40px] xl:h-[44px] w-full'>{userdata?.subscription[0]?.subscription_plan}</button>
                                     <button className='text-[#28CF75] rounded bg-[#DFF8EB] xl:text-lg text-base active:font-bold max-w-[150px] xl:max-w-[177px] h-[30px] xl:h-[35px] w-full'> Subscription {userdata?.subscription[0]?.status}</button>
                                 </div>
-                                <p className='xl:text-lg text-[#939393] px-8'>You are currently on an {userdata?.subscription[0]?.subscription_plan} Subscription Plan at $180 {userdata?.subscription[0]?.renewal_frequency} which <span className='text-black'>renew on {userdata?.subscription[0]?.renewal_date}.</span></p>
-                                <div className='flex justify-end pb-4 xl:pb-6 px-6 mt-4'>
-                                    <button className='font-bold xl:text-base text-sm  w-[120px] xl:w-[160px] xl:h-[50px] h-[40px] bg-black rounded-3xl text-white'>Change Plan</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full '>
-                            <div className='flex justify-between items-center gap-2'>
-                                <h3 className='font-bold xl:text-2xl text-xl'>Payment methods</h3>
-                                <button className='border border-[#4C4C4C] rounded px-3 py-1 sm:text-base text-sm' onClick={() => handleCardAddOrEdit()}>Add New Card</button>
-                            </div>
-                            <div className='border mt-3 xl:mt-4 rounded py-3 xl:py-4 px-3 xl:px-6 sm:py-6 flex flex-col gap-4 lg:h-[260px] overflow-y-auto'>
-                                {cardsList && cardsList.map((card, i) =>
-                                    <div key={i} className='flex justify-between gap-2 '>
-                                        <div className='flex items-center gap-4 '>
-                                            <div className='bg-[#E1E1E1] rounded-full flex justify-center items-center w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]'>
-                                                <img src={masterCardIcon} alt='card_icon' />
-                                            </div>
-                                            <p className='text-[#939393] xl:text-lg text-base'>{card.card_number.slice(0, -3).replace(/\d/g, '*') + card.card_number.slice(-3)}</p>
-                                        </div>
-                                        <div className='flex gap-3 items-center'>
-                                            <button className='xl:text-base text-sm underline' onClick={() => handleCardAddOrEdit(card.id)}>Edit</button>
-                                            <span className='border-l h-4'></span>
-                                            <button className='xl:text-base text-sm underline' onClick={() => handleDeleteCard(card.id)}>Remove</button>
-                                        </div>
+                                <p className='xl:text-lg text-[#939393] px-8'>
+                                    You are currently on a {userdata?.subscription[0]?.renewal_frequency} {userdata?.subscription[0]?.subscription_plan} Subscription Plan at ${userdata?.subscription[0]?.subscription_plan_price} which 
+                                    <span className='text-black'>
+                                        {userdata?.subscription[0]?.subscription_plan === 'Free' ? ' ends on ' : ' renews on '}
+                                        {userdata?.subscription[0]?.renewal_date}.
+                                    </span>
+                                </p>                                
+                                {userdata.is_owner && (
+                                    <div className='flex justify-end pb-4 xl:pb-6 px-6 mt-4'>
+                                        <button className='font-bold xl:text-base text-sm  w-[120px] xl:w-[160px] xl:h-[50px] h-[40px] bg-black rounded-3xl text-white'>Change Plan</button>
                                     </div>
                                 )}
-
                             </div>
                         </div>
+                        {userdata.is_owner && (
+                            <div className='w-full '>
+                                <div className='flex justify-between items-center gap-2'>
+                                    <h3 className='font-bold xl:text-2xl text-xl'>Payment methods</h3>
+                                    <button className='border border-[#4C4C4C] rounded px-3 py-1 sm:text-base text-sm' onClick={() => handleCardAddOrEdit()}>Add New Card</button>
+                                </div>
+                                <div className='border mt-3 xl:mt-4 rounded py-3 xl:py-4 px-3 xl:px-6 sm:py-6 flex flex-col gap-4 lg:h-[260px] overflow-y-auto'>
+                                    {console.log('cardsList:', cardsList)}
+                                    {cardsList && cardsList.length > 0 ? (
+                                        cardsList.map((card, i) =>
+                                            <div key={i} className='flex justify-between gap-2 '>
+                                                <div className='flex items-center gap-4 '>
+                                                    <div className='bg-[#E1E1E1] rounded-full flex justify-center items-center w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]'>
+                                                        <img src={masterCardIcon} alt='card_icon' />
+                                                    </div>
+                                                    <p className='text-[#939393] xl:text-lg text-base'>{card.card_number.slice(0, -3).replace(/\d/g, '*') + card.card_number.slice(-3)}</p>
+                                                </div>
+                                                <div className='flex gap-3 items-center'>
+                                                    <button className='xl:text-base text-sm underline' onClick={() => handleCardAddOrEdit(card.id)}>Edit</button>
+                                                    <span className='border-l h-4'></span>
+                                                    <button className='xl:text-base text-sm underline' onClick={() => handleDeleteCard(card.id)}>Remove</button>
+                                                </div>
+                                            </div>
+                                        )
+                                    ) : (
+                                        <p className='text-[#939393] xl:text-lg text-base'>No payment methods have been added</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

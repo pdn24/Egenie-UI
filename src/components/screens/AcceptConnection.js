@@ -5,7 +5,7 @@ import { Cookies } from 'react-cookie';
 import UserContext from '../../context/userInfoContext';
 
 const AcceptConnection = () => {
-  const { fetchUserInfo } = useContext(UserContext);
+  const { isStoreConnected, setIsStoreConnected, fetchUserInfo , set } = useContext(UserContext);
   const cookies = new Cookies();
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,20 +36,28 @@ const AcceptConnection = () => {
 
         if (page === "googlelogin") {
           console.log('AcceptConnection - Inside if condition for googlelogin');
-          console.log('AcceptConnection - storeId:', storeId);
-          console.log('AcceptConnection - storeName:', storeName);
+         
 
-          if (storeId && storeName) {
+          if (storeId && storeName && storeId !== "None" && storeName !== "None") {
+            console.log('AcceptConnection googlelogin - storeId:', storeId);
+            console.log('AcceptConnection googlelogin - storeName:', storeName);
+            console.log("storeId:", storeId, "Type:", typeof storeId);
+            console.log("storeName:", storeName, "Type:", typeof storeName);
             // Await the fetchUserInfo call
-            await fetchUserInfo(userId);
+            await fetchUserInfo(userId);          
+            localStorage.setItem("active_store_id", storeId);
+            setIsStoreConnected(true);
             console.log("Came back to AcceptConnection from UserProvider. Navigating to /home2");
             navigate("/home2");
           } else {
             navigate("/connectstore2", { state: { isConnectNewStore: true } });
           }
         } else if (page === "shopifyconnect" && storeId && storeName) {
-          navigate("/home2");
-        } else if (page === "reset") {
+          console.log("In acceptconnection hi finally")         
+          navigate("/storeConnected");
+        } else if (page === "invitation") {
+          navigate(`/setpassword?userId=${userId}`);
+        }else if (page === "reset") {
           navigate(`/user/reset_password/${token || existingToken}`);
         }
       } else {

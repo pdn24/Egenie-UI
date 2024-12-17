@@ -32,14 +32,24 @@ export default function ConnectStore2() {
             }
             const response = await axios.post(`${apiUrl}/shopify/connect`, data, {
                 headers: { 'Content-Type': 'application/json' }
-            })
-            await fetchUserInfo(userId)
-            const shopifyUrl = response.data.oauth_url
-            navigate("/storeconnected", { state: { IsAfterConecting: true } })
-            window.open(shopifyUrl)
-            // navigate('/storeconnected')
+            })         
+            // Ensure the store connection is successful before fetching user info
+            if (response.status === 200) {
+                await fetchUserInfo(userId) // Fetch user info after successful connection
+                const shopifyUrl = response.data.oauth_url            
+                navigate("/storeconnected", { state: { IsAfterConecting: true } })
+                window.open(shopifyUrl)
+            } else {
+                setError('Failed to connect store');
+            }      
         } catch (err) {
-            console.log('err: ', err)
+            if (err.response && err.response.status === 400) {
+                console.log("error from backend: ", err.response.data);
+                setError(err.response.data.error || 'An error occurred'); // Set error message from response
+            } else {
+                console.log('err: ', err);
+                setError('An unexpected error occurred');
+            }
         }
 
     }

@@ -6,7 +6,7 @@ import "../../assets/css/loader.css";
 import EgenieLogo from '../../assets/icons/EgenieLogo.svg';
 import googleIcon from '../../assets/image/google.svg';
 import facebookIcon from '../../assets/image/facebook.svg';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation} from 'react-router-dom';
 import sendIcon from '../../assets/icons/sendIcon.svg';
 import closeIcon from '../../assets/icons/closeIconWhite.svg';
 import axios from 'axios';
@@ -15,8 +15,10 @@ import UserContext from '../../context/userInfoContext';
 
 
 const Login = () => {
+    // ... existing code ...
+    const location = useLocation();
     const cookies = new Cookies();
-    const { fetchUserInfo } = useContext(UserContext);
+    const { fetchUserInfo, userdata } = useContext(UserContext);
     const navigate = useNavigate();
     const [formValue, setFormValue] = useState({
         username: '',
@@ -54,9 +56,6 @@ const Login = () => {
         if (!formValue.password) {
             newErrors.password = "Password is required.";
             formIsValid = false;
-        } else if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/.test(formValue.password)) {
-            newErrors.password = 'Please enter a valid password';
-            formIsValid = false;
         } else {
             newErrors.password = "";
         }
@@ -66,19 +65,23 @@ const Login = () => {
         }
         try {
             setLoading(true);
+            console.log("Password: ", formValue.password)
             const response = await axios.post(`${apiUrl}/auth`, formValue, {
                 headers: { 'Content-Type': 'application/json' },
             });
             const login_token = response.data?.access_token;
             cookies.set('login_token', login_token);
             cookies.set('user_id', response.data?.user?.id);
-            localStorage.setItem("user_info", JSON.stringify(response.data?.user));
+            localStorage.setItem("user_info", JSON.stringify(response.data?.user));           
+            setFormValue({ username: "", password: "" });
+            setErrors({ username: "", password: "", form: "" });            
+            console.log("Fetching user info for user ID:", response.data?.user?.id);
+            fetchUserInfo(response.data?.user?.id);            
             const activeStore = response.data?.user?.stores.find((store) => store.is_selected === true);
             localStorage.setItem("active_store_id", activeStore?.id);
-            setFormValue({ username: "", password: "" });
-            setErrors({ username: "", password: "", form: "" });
-            fetchUserInfo(response.data?.user?.id);
+            console.log("Navigating to /connectstore2 with state: { isConnectNewStore: true }");
             navigate("/connectstore2", { state: { isConnectNewStore: true } });
+            
         } catch (error) {
             console.log("login error", error);
             setErrors({ ...errors, form: error.response?.data[0] || error.message || "Something went wrong" });
@@ -97,10 +100,14 @@ const Login = () => {
 
     useEffect(() => {
         const token = cookies.get("login_token");
-        if (token) {
+        const locationState = location.state || {};
+        
+        // Only navigate to '/home2' if not coming from 'setpassword'
+        if (token && !locationState.fromSetPassword) {            
+            console.log("Login.js: Token found, navigating to /home2");           
             navigate('/home2');
         }
-    }, []);
+    }, [cookies, navigate]);
 
     return (
         <div>
@@ -173,6 +180,11 @@ const Login = () => {
                                         <button className='w-full h-[42px] xl:h-[50px] rounded-3xl text-center bg-white text-black text-base xl:text-lg font-bold'>Log In</button>
                                     </div>
                                 </form>
+                                <div className='flex justify-center w-full mt-2'>
+                                    <Link to='/forgot-password'>
+                                        <span className='text-white underline text-sm xl:text-base'>Forgot Password?</span>
+                                    </Link>
+                                </div>
                                 <div className='flex items-center flex-col px-5 sm:px-10 xl:px-16 xl:mt-10 mt-3 gap-6 helvetica'>
                                     <div className='flex items-center text-white w-full gap-2'>
                                         <span className='border-t w-full border-gray-700'></span>
