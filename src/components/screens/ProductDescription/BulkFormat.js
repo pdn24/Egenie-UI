@@ -216,7 +216,7 @@ export default function BulkFormat() {
       };
       if (allFormatTypes.length === 0) {
         const allFormatTypesResponse = await axios.post(
-          `${apiUrl}/templates/get_templates`,
+          `${apiUrl}/templates/get_user_templates`,
           data
         );
         setAllFormatTypes(allFormatTypesResponse.data);
@@ -272,8 +272,10 @@ export default function BulkFormat() {
     setSelectedProductsForFormat([]);
   };
   const handleMagicZone = (product, e) => {
+    e.stopPropagation();
     if (e.target.checked) {
       fetchAllForamtTypes();
+      setMagicVisible(true);
     }
     setSelectedProductsForFormat((prevSelectedProductsForFormat) => {
       if (prevSelectedProductsForFormat.some((p) => p.shopify_product_id === product.shopify_product_id)) {
@@ -412,10 +414,10 @@ export default function BulkFormat() {
           <div className="w-full overflow-x-auto lg:overflow-y-hidden">
             <div className="p-6 sm:p-9 ">
               <div className="flex gap-4 w-full items-center justify-start bulkFormatHedding flex-wrap">
-                <h2 className="sm:text-2xl md:text-3xl text-xl font-bold min-w-[250px] text-center w-fit  ">
+                <h2 className="sm:text-2xl md:text-3xl text-xl font-bold min-w-[250px] text-center w-fit">
                   Bulk Format page
                 </h2>
-                <div className="flex justify-between items-center helvetica flex-wrap gap-2 inputAlign w-fit	">
+                <div className="flex justify-between items-center helvetica flex-wrap gap-2 inputAlign w-fit">
                   <div className="relative">
                     <img
                       src={searchIcon}
@@ -425,7 +427,7 @@ export default function BulkFormat() {
                     />
                     <input
                       placeholder="Search"
-                      className="py-2 pl-9 bg-transparent sm:h-[50px] h-[36px] border rounded-md w-[200px]  md:w-[270px] xl:w-[350px] max-w-[350px] borderLightThinGray"
+                      className="py-2 pl-9 bg-transparent sm:h-[50px] h-[36px] border rounded-md w-[200px] md:w-[270px] xl:w-[350px] max-w-[350px] borderLightThinGray"
                       onChange={(e) => {
                         setInputSearch(e.target.value);
                         setCurrentPage(1);
@@ -434,7 +436,7 @@ export default function BulkFormat() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-3 my-4 flex-wrap justify-center sm:justify-start ">
+              <div className="flex gap-3 my-4 flex-wrap justify-center sm:justify-start">
                 <div className="relative">
                   <Dropdown
                     label={seletedPeriodValueName || "Period"}
@@ -534,182 +536,114 @@ export default function BulkFormat() {
                     : ""
                     }}`}
                 >
-                  {loading && (
+                  {loading ? (
                     <div className="flex items-center justify-center">
                       <div className="spinner"></div>
                     </div>
-                  )}
-                  <table
-                    className={`w-full rounded-lg min-w-[650px] ${loading ? "absolute top-0" : ""
-                      } ${isDateRangeOpen ? "blur-[5px]" : ""}`}
-                  >
-                    <thead className=" text-black text-left helvetica border-b border-gray-100 sticky top-0 bg-white  z-9">
-                      <tr>
-                        <th scope="col" className="p-4 rounded-xl">
-                          <input
-                            type="checkbox"
-                            value=""
-                            className="w-4 h-4 rounded focus:right-0 checked:bg-black focus:ring-0 cursor-pointer"
-                            onChange={handleCheckAll}
-                            checked={
-                              products.length > 0 &&
-                              selectedProductsForFormat.length ===
-                              products.length
-                            }
-                          />
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 text-xs sm:text-sm xl:text-base"
-                        >
-                          Image
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 max-w-[420px] text-xs sm:text-sm xl:text-base"
-                        >
-                          <span className="max-w-[300px]"> Title</span>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 text-center text-xs sm:text-sm xl:text-base"
-                        >
-                          Formatted
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 text-center text-xs sm:text-sm xl:text-base whitespace-nowrap"
-                        >
-                          Created At
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 text-center text-xs sm:text-sm xl:text-base whitespace-nowrap"
-                        >
-                          Product Type
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-1 py-3 text-center text-xs sm:text-sm xl:text-base sticky right-0 bg-white"
-                        >
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {products?.length > 0 && !loading
-                        ? products.map((product, i) => (
-                          <tr className="border-b border-gray-100" key={i}>
-                            <td className="w-4 p-4">
-                              <input
-                                type="checkbox"
-                                className="w-4 h-4 rounded checked:bg-black focus:ring-0 cursor-pointer"
-                                onChange={(e) => handleMagicZone(product, e)}
-                                checked={selectedProductsForFormat.some(
-                                  (p) => p.shopify_product_id === product.shopify_product_id
-                                )}
-                              />
-                            </td>
-                            <td className="px-1 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                              <div className="w-[75px] h-[75px] rounded border">
-                                <img
-                                  src={product.image_url}
-                                  alt="product"
-                                  className="w-full h-full rounded"
-                                />
-                              </div>
-                            </td>
-                            <td className="px-1 py-4 align-top font-medium text-xs sm:text-sm xl:text-base">
-                              {product.title}
-                            </td>
-                            <td className="px-1 py-4 align-top text-center">
-                              <button>
-                                <img
-                                  src={
-                                    product.modified_by_egenie
-                                      ? checkCircle
-                                      : closeRedIcon
-                                  }
-                                  alt="close red icon"
-                                />
-                              </button>
-                            </td>
-                            <td className="px-1 py-4 align-top text-center font-medium text-xs sm:text-sm xl:text-base whitespace-nowrap">
-                              {formatDate(product.created_at)}
-                            </td>
-                            <td className="px-1 py-4 align-top text-center font-medium text-xs sm:text-sm xl:text-base">
-                              {product.product_type}
-                            </td>
-                            <td className="px-1 py-4 align-top text-center flex justify-center gap-3 sticky right-0 bg-white">
-                              <Tooltip content="Info" placement="bottom">
-                                <button
-                                  onClick={() =>
-                                    handleProductDetail(product.shopify_product_id)
-                                  }
-                                >
-                                  {" "}
-                                  <img
-                                    src={infoGray}
-                                    className={`${product.modified_by_egenie
-                                      ? "brightness-0"
-                                      : "brightness-90"
-                                      } min-w-4`}
-                                    alt="info"
-                                  />
-                                </button>
-                              </Tooltip>
-                              <Tooltip content="Revert" placement="bottom">
-                                <button
-                                  onClick={() =>
-                                    handleRevertProduct(product.shopify_product_id)
-                                  }
-                                  disabled={!product.modified_by_egenie}
-                                >
-                                  {" "}
-                                  <img
-                                    src={restartGray}
-                                    className={`${product.modified_by_egenie
-                                      ? "brightness-0"
-                                      : "brightness-90"
-                                      } min-w-4`}
-                                    alt="restart gray"
-                                  />
-                                </button>
-                              </Tooltip>
-                              <Tooltip content="Compare" placement="bottom">
-                                <button
-                                  onClick={() =>
-                                    handleProductComparison(product.product_id)
-                                  }
-                                  disabled={!product.modified_by_egenie}
-                                >
-                                  {" "}
-                                  <img
-                                    src={sortGray}
-                                    className={`${product.modified_by_egenie
-                                      ? "brightness-0"
-                                      : "brightness-90"
-                                      } min-w-4`}
-                                    alt="sort gray"
-                                  />
-                                </button>
-                              </Tooltip>
-                            </td>
-                          </tr>
-                        ))
-                        : !loading && (
-                          <tr>
-                            <td
-                              colSpan={7}
-                              className="px-1 py-4 align-top text-center font-medium text-xs sm:text-sm xl:text-base"
+                  ) : (
+                    <>
+                      <div className="flex items-center mb-4 ml-4">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded checked:bg-black focus:ring-0 cursor-pointer"
+                          onChange={handleCheckAll}
+                          checked={
+                            products.length > 0 &&
+                            selectedProductsForFormat.length === products.length
+                          }
+                        />
+                        <span className="ml-2 text-xs">Select All</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4">
+                        {products?.length > 0
+                          ? products.slice(0, 10).map((product, i) => (
+                            <div
+                              key={i}
+                              className="border rounded-lg p-4 bg-white shadow-sm flex flex-col cursor-pointer"
+                              onClick={() => handleProductDetail(product.shopify_product_id)}
                             >
-                              <p>No Product Found</p>
-                            </td>
-                          </tr>
-                        )}
-                    </tbody>
-                  </table>
+                              <div className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  className="w-4 h-4 rounded checked:bg-black focus:ring-0 cursor-pointer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => {
+                                    handleMagicZone(product, e);
+                                  }}
+                                  checked={selectedProductsForFormat.some((p) => p.shopify_product_id === product.shopify_product_id)}
+                                />
+                                <span className="text-sm font-semibold mb-2 ml-2">
+                                  {product.title}
+                                </span>
+                              </div>
+                              <div className="flex items-start">
+                                <div className="flex-shrink-0 mr-4">
+                                  <div className="w-[75px] h-[75px] rounded border">
+                                    <img
+                                      src={product.image_url}
+                                      alt="product"
+                                      className="w-full h-full rounded"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex-grow">
+                                  <p className="text-xs mb-1">
+                                    <span className="font-semibold">Formatted: </span>
+                                    <span
+                                      className={`font-bold ${product.modified_by_egenie
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                        }`}
+                                    >
+                                      {product.modified_by_egenie ? "Yes" : "No"}
+                                    </span>
+                                  </p>
+                                  <p className="text-xs mb-1">
+                                    <span className="font-semibold">Created At: </span>
+                                    {formatDate(product.created_at)}
+                                  </p>
+                                  <p className="text-xs mb-1">
+                                    <span className="font-semibold">Product Type: </span>
+                                    {product.product_type}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex justify-start space-x-2 mt-2">
+                                <Tooltip content="Revert to previous version of description" placement="bottom">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleRevertProduct(product.shopify_product_id);
+                                    }}
+                                    disabled={!product.modified_by_egenie}
+                                    className="bg-gray-200 text-black px-2 py-1 rounded"
+                                  >
+                                    Revert
+                                  </button>
+                                </Tooltip>
+                                <Tooltip content="Compare with previous version of description" placement="bottom">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleProductComparison(product.product_id);
+                                    }}
+                                    disabled={!product.modified_by_egenie}
+                                    className="bg-gray-200 text-black px-2 py-1 rounded"
+                                  >
+                                    Compare
+                                  </button>
+                                </Tooltip>
+                              </div>
+                            </div>
+                          ))
+                          : (
+                            <p className="text-center col-span-full">
+                              No Product Found
+                            </p>
+                          )}
+                      </div>
+                    </>
+                  )}
                   {products?.length > 0 && !loading && (
                     <div className="sticky bottom-0">
                       <Pagination
@@ -745,21 +679,36 @@ export default function BulkFormat() {
                       </p>
                     </div>
                     <h3 className="text-sm text-gray-500 mt-2">
-                        Choose if Egenie should modify the title, type, or SEO tags using AI.
+                      Choose if Egenie should modify the title, type, or SEO tags
+                      using AI.
                     </h3>
                     <div className="my-8">
                       <div className="flex flex-col space-y-2">
                         <label className="flex items-center">
-                          <input type="checkbox" className="mr-2" onChange={(e) => setModifyTitle(e.target.checked)} />
-                            Product Title
+                          <input
+                            type="checkbox"
+                            className="mr-2"
+                            onChange={(e) => setModifyTitle(e.target.checked)}
+                          />
+                          Product Title
                         </label>
                         <label className="flex items-center">
-                          <input type="checkbox" className="mr-2" onChange={(e) => setModifyProductType(e.target.checked)} />
-                            Product Type
+                          <input
+                            type="checkbox"
+                            className="mr-2"
+                            onChange={(e) =>
+                              setModifyProductType(e.target.checked)
+                            }
+                          />
+                          Product Type
                         </label>
                         <label className="flex items-center">
-                          <input type="checkbox" className="mr-2" onChange={(e) => setModifySeoTags(e.target.checked)} />
-                            SEO Tags
+                          <input
+                            type="checkbox"
+                            className="mr-2"
+                            onChange={(e) => setModifySeoTags(e.target.checked)}
+                          />
+                          SEO Tags
                         </label>
                       </div>
                       <div className="relative mt-4">
@@ -804,9 +753,6 @@ export default function BulkFormat() {
           ) : (
             <></>
           )}
-          ) : (
-            <></>
-          )
         </div>
       </div>
 
@@ -819,7 +765,7 @@ export default function BulkFormat() {
       >
         <Modal.Header className="border-0 p-2"></Modal.Header>
         <Modal.Body className="pl-10 pr-10 pb-10 pt-0 helvetica">
-          <div>           
+          <div>
             <p className="sm:text-xl text-lg font-medium text-center">
               {selectedProcuct.title}
             </p>
@@ -852,10 +798,9 @@ export default function BulkFormat() {
                 value={selectedProcuct.description}
                 readOnly={true}
                 theme="snow"
-                style={{ height: '400px' }}
+                style={{ height: "400px" }}
               />
             </div>
-         
           </div>
         </Modal.Body>
       </Modal>
@@ -880,22 +825,27 @@ export default function BulkFormat() {
                 <p className="text-[#9B9B9B] sm:text-sm text-xs my-2 font-medium">
                   {originalProductData.title}
                 </p>
-                <p className="text-sm my-2 font-medium text-black"> 
-                  Description {" "}
+                <p className="text-sm my-2 font-medium text-black">
+                  Description{" "}
                 </p>
-                <div className="text-[#9B9B9B] text-sm" style={{ height: '400px', overflowY: 'scroll' }}>
-                  <Quill value={originalProductData.body_html} readOnly={true} theme="bubble" />
+                <div
+                  className="text-[#9B9B9B] text-sm"
+                  style={{ height: "400px", overflowY: "scroll" }}
+                >
+                  <Quill
+                    value={originalProductData.body_html}
+                    readOnly={true}
+                    theme="bubble"
+                  />
                 </div>
-                <p className="text-sm my-2 font-medium text-black"> 
+                <p className="text-sm my-2 font-medium text-black">
                   {" "}
                   Product type
                 </p>
                 <p className="text-[#9B9B9B] text-sm">
                   {originalProductData.product_type}
                 </p>
-                <p className="text-sm my-2 font-medium text-black"> 
-                  Tags {" "}
-                </p>
+                <p className="text-sm my-2 font-medium text-black"> Tags </p>
                 <p className="text-[#9B9B9B] text-sm">
                   {originalProductData.tags}
                 </p>
@@ -917,29 +867,31 @@ export default function BulkFormat() {
                 <h2 className="text-black font-bold text-xl mb-2 helvetica">
                   Formatted Product Data
                 </h2>
-                <p className="text-sm my-2 font-medium text-black"> 
-                  {" "}
-                  Title 
-                </p>
+                <p className="text-sm my-2 font-medium text-black"> Title </p>
                 <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.title}
                 </p>
-                <p className="text-sm my-2 font-medium text-black"> 
-                  Description {" "}
+                <p className="text-sm my-2 font-medium text-black">
+                  Description{" "}
                 </p>
-                <div className="text-[#9B9B9B] text-sm" style={{ height: '400px', overflowY: 'scroll' }}>
-                  <Quill value={modifiedProductData.body_html} readOnly={true} theme="bubble" />
+                <div
+                  className="text-[#9B9B9B] text-sm"
+                  style={{ height: "400px", overflowY: "scroll" }}
+                >
+                  <Quill
+                    value={modifiedProductData.body_html}
+                    readOnly={true}
+                    theme="bubble"
+                  />
                 </div>
-                <p className="text-sm my-2 font-medium text-black"> 
+                <p className="text-sm my-2 font-medium text-black">
                   {" "}
-                  Product type 
+                  Product type
                 </p>
                 <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.product_type}
                 </p>
-                <p className="text-sm my-2 font-medium text-black"> 
-                  Tags {" "}
-                </p>
+                <p className="text-sm my-2 font-medium text-black"> Tags </p>
                 <p className="text-[#9B9B9B] text-sm">
                   {modifiedProductData.tags}
                 </p>

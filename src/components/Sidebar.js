@@ -54,6 +54,7 @@ export default function Sidebar() {
             case "/template":
             case "/generateTemplate":
             case "/bulkformat":
+            case "/createTemplate":
             case "/storeConnected":
                 setSubMenuVisibility({ ...subMenuVisibility, product: true, });
                 break;

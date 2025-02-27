@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { showAlert } from "../../utils/AlertService";
 
-function SuperuserAccountInfo() {
+function AdminAccountInfo() {
   const cookies = new Cookies();
   const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -186,4 +186,4 @@ function SuperuserAccountInfo() {
   );
 }
 
-export default SuperuserAccountInfo;
+export default AdminAccountInfo;

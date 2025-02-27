@@ -48,7 +48,7 @@ export default function ConnectStore2() {
                 setError(err.response.data.error || 'An error occurred'); // Set error message from response
             } else {
                 console.log('err: ', err);
-                setError('An unexpected error occurred');
+                setError(err.response.data.error);
             }
         }
 

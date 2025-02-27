@@ -13,10 +13,10 @@ export default function GenerateTemplate() {
     const cookies = new Cookies();
     const userId = cookies.get('user_id')
     const navigate = useNavigate()
-    const { isStoreConnected } = useContext(UserContext)   
+    const { isStoreConnected, userdata } = useContext(UserContext)   
     const [templateList, setTemplateList] = useState([])
-    const [productTypeList, setproductTypeList] = useState([])
-    const [productTypeLabel, setProductTypeLabel] = useState('Select Product Type')
+    const [productCatgeoryList, setProductCatgeoryList] = useState([])
+    const [productCatgeoryLabel, setProductCategoryLabel] = useState('Select Product Category')
     const [templateLabel, setTemplateLabel] = useState('Select Existing Template')   
     const [loading, setLoading] = useState(false)
     const [editorContent, setEditorContent] = useState(''); // State for Quill editor content
@@ -25,6 +25,7 @@ export default function GenerateTemplate() {
     const [isSaveHidden, setIsSaveHidden] = useState(true); // State for save button hidden
     const apiUrl = process.env.REACT_APP_API_URL;
     const storeId = localStorage.getItem('active_store_id')
+    const broadCategories = userdata?.stores?.[0]?.broad_product_categories_ai_generated || [];
 
     
     
@@ -141,20 +142,17 @@ export default function GenerateTemplate() {
             setLoading(false)
         }
     }
-    const getProductTypeList= async () => {
+    const getProductCategoryList= async () => {
         try {          
-            const response = await axios.post(`${apiUrl}/shopify/get_product_types`, {                 
-                user_id: userId,
-                store_id: storeId
-            });
-            setproductTypeList(response.data.product_types)
+            const response = await axios.get(`${apiUrl}/products/get_product_categories`);
+            setProductCatgeoryList(response.data.category_list)
         } catch (err) {
             console.log('err: ', err)
         }
     } 
 
     useEffect(() => {
-        getProductTypeList()
+        getProductCategoryList()
         getTemplateList()       
     }, [])
 
@@ -162,9 +160,8 @@ export default function GenerateTemplate() {
     const handleGenerate = async () => {
         setLoading(true); // Start loading animation
         const data = {
-            user_id: userId,
-            store_id: storeId,
-            product_type: productTypeLabel,
+            user_id: userId,           
+            product_category: productCatgeoryLabel,
             product_description_sample: editorContent
         };
         try {
@@ -191,13 +188,13 @@ export default function GenerateTemplate() {
                                 <div className='templateDropdown flex items-center justify-start gap-2'>
                                     <label className='sm:text-base text-sm'>Product Type:</label>
                                     <div className='relative'>
-                                        <Dropdown label={productTypeLabel} className='option-height'>
-                                            {productTypeList.map((productType, index) => (
+                                        <Dropdown label={productCatgeoryLabel} className='option-height'>
+                                            {broadCategories.map((category, index) => (
                                                 <Dropdown.Item key={index} onClick={() => {
-                                                    setProductTypeLabel(productType);
+                                                    setProductCategoryLabel(category);
                                                     setEditorContent(''); // Clear the contents of the editor
                                                 }}>
-                                                    {productType}
+                                                    {category}
                                                 </Dropdown.Item>
                                             ))}
                                         </Dropdown>

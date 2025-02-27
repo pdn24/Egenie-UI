@@ -482,7 +482,7 @@ const Home = () => {
                   Sign In
                 </span>
               </Link>
-            </p>
+            </p>            
           </div>
         </div>
       </Modal.Body>

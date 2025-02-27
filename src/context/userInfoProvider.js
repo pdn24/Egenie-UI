@@ -47,6 +47,7 @@ export const UserProvider = ({ children }) => {
     const handleLogOut = async () => {
         cookies.remove("login_token", { path: '/' });
         cookies.remove("user_id", { path: '/' });
+        cookies.remove("user_role", { path: '/' });        
         console.log("cookies cleared");
         localStorage.removeItem("user_info");
         localStorage.removeItem("active_store_id");
